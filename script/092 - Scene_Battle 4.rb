@@ -42,17 +42,8 @@ class Scene_Battle
   #--------------------------------------------------------------------------
   def use_skill(user,id)
     # 设置目标
-    if user.is_a?(Game_Actor)
-      user_name = "你"
-      target = @enemy
-      target_name = target.name
-      n_phase = 2
-    else
-      user_name = user.name
-      target = @actor
-      target_name = "你"
-      n_phase = 1
-    end
+    t_arr = set_target(user)
+    target,user_name,target_name,n_phase = t_arr[0],t_arr[1],t_arr[2],t_arr[3]
     # 扣除HP/FP/MP消耗
     sp_skill = $data_skills[id]
     user.hp -= sp_skill.hp_cost
@@ -60,14 +51,10 @@ class Scene_Battle
     user.mp -= user.get_mp_cost(id)
     # 获取攻击位置
     pos_id = rand($data_system.hit_place.size)
-    atk_pos = $data_system.hit_place[pos_id].deep_clone
-    weapon_name = user.weapon_id > 0 ? $data_weapons[user.weapon_id].name : ""
+    @atk_pos = $data_system.hit_place[pos_id].deep_clone
     # 显示使用文本
     text = sp_skill.use_text[0].deep_clone
-    text.gsub!("user",user_name)
-    text.gsub!("target",target_name)
-    text.gsub!("position",atk_pos)
-    text.gsub!("weapon",weapon_name)
+    text = replace_text(text,user,user_name,target_name)
     show_text(text)
     # 应用绝招效果
     skill_result = user.skill_effect(target,id)
@@ -75,10 +62,7 @@ class Scene_Battle
     when 0 # 显示文本跳转至下一回合
       if skill_result[1] != nil
         text = skill_result[1]
-        text.gsub!("user",user_name)
-        text.gsub!("target",target_name)
-        text.gsub!("position",atk_pos)
-        text.gsub!("weapon",weapon_name)
+        text = replace_text(text,user,user_name,target_name)
         if user.damage.is_a?(String)
           # 播放闪避音效
           $game_system.se_play($data_system.enemy_collapse_se)
@@ -173,9 +157,41 @@ class Scene_Battle
     end
   end
   #--------------------------------------------------------------------------
+  # ● 文本替换
+  #--------------------------------------------------------------------------
+  def replace_text(text,user,user_name,target_name)
+    weapon_name = user.weapon_id > 0 ? $data_weapons[user.weapon_id].name : ""
+    text.gsub!("user",user_name)
+    text.gsub!("target",target_name)
+    text.gsub!("position",@atk_pos)
+    text.gsub!("weapon",weapon_name)
+    return text
+  end
+  #--------------------------------------------------------------------------
+  # ● 设置目标
+  #--------------------------------------------------------------------------
+  def set_target(user)
+    # 设置目标
+    if user.is_a?(Game_Actor)
+      user_name = "你"
+      target = @enemy
+      target_name = target.name
+      n_phase = 2
+    else
+      user_name = user.name
+      target = @actor
+      target_name = "你"
+      n_phase = 1
+    end
+    return [target,user_name,target_name,n_phase]
+  end
+  #--------------------------------------------------------------------------
   # ● 状态更新
   #--------------------------------------------------------------------------
   def states_change(user)
+    # 设置目标
+    t_arr = set_target(user)
+    target,user_name,target_name,n_phase = t_arr[0],t_arr[1],t_arr[2],t_arr[3]
     # 刷新状态持续回合
     removed = user.remove_states_auto
     # 有被解除的状态则获取状态解除文本
@@ -183,14 +199,11 @@ class Scene_Battle
       removed.each do |i|
         sp_skill = $data_skills[i]
         text = sp_skill.end_text[0].deep_clone
-        text.gsub!("user",user_name)
-        text.gsub!("target",target_name)
-        text.gsub!("position",atk_pos)
-        text.gsub!("weapon",weapon_name)
+        text = replace_text(text,user,user_name,target_name)
         show_text(text)
       end
     end
-    user.states_effect
+    state_result = user.states_effect
     # 刷新CD回合
     user.remove_cd_auto
   end

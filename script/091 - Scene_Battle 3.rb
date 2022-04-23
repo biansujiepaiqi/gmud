@@ -34,29 +34,18 @@ class Scene_Battle
   #--------------------------------------------------------------------------
   def common_attack(user,kf_id = 0,act_id = -1)
     # 设置目标
-    if user.is_a?(Game_Actor)
-      user_name = "你"
-      target = @enemy
-      target_name = target.name
-    else
-      user_name = user.name
-      target = @actor
-      target_name = "你"
-    end
+    t_arr = set_target(user)
+    target,user_name,target_name,n_phase = t_arr[0],t_arr[1],t_arr[2],t_arr[3]
     # 获取攻击位置
     id = rand($data_system.hit_place.size)
-    atk_pos = $data_system.hit_place[id].deep_clone
-    weapon_name = user.weapon_id > 0 ? $data_weapons[user.weapon_id].name : ""
+    @atk_pos = $data_system.hit_place[id].deep_clone
     # 获取攻击招式
     if kf_id > 0
       atk_text = user.get_kf_id_action(kf_id,act_id)
     else
       atk_text = user.get_kf_action(0)
     end
-    atk_text.gsub!("user",user_name)
-    atk_text.gsub!("target",target_name)
-    atk_text.gsub!("position",atk_pos)
-    atk_text.gsub!("weapon",weapon_name)
+    atk_text = replace_text(atk_text,user,user_name,target_name)
     # 显示攻击文本
     show_text(atk_text)
     # 应用普通攻击效果
@@ -65,7 +54,7 @@ class Scene_Battle
     # 伤害为字符串，即未命中的情况
     if damage.is_a?(String)
       eva_result = damage.split(".")
-      text = get_eva_text(eva_result[1].to_i,target,atk_pos)
+      text = get_eva_text(eva_result[1].to_i,target,@atk_pos)
       # 播放闪避音效
       $game_system.se_play($data_system.enemy_collapse_se)
       show_text(text)
@@ -86,21 +75,12 @@ class Scene_Battle
   #--------------------------------------------------------------------------
   def get_eva_text(type,user,pos)
     # 设置目标
-    if user.is_a?(Game_Actor)
-      user_name = "你"
-      target = @enemy
-      target_name = target.name
-    else
-      user_name = user.name
-      target = @actor
-      target_name = "你"
-    end
+    t_arr = set_target(user)
+    target,user_name,target_name,n_phase = t_arr[0],t_arr[1],t_arr[2],t_arr[3]
     case type
     when 1 # 轻功闪避
       text = user.get_kf_action(1)
-      text.gsub!("user",user_name)
-      text.gsub!("target",target_name)
-      text.gsub!("position",pos)
+      text = replace_text(text,user,user_name,target_name)
     when 2 # 招架
       t = user.weapon_id == 0 ? $data_system.hand_def : $data_system.weapon_def
       text = t[rand(t.size)].deep_clone
@@ -320,8 +300,6 @@ class Scene_Battle
           # 更新地图事件
           $game_map.refresh_map_events
           @phase5_step = 3
-        # 如果是BOSS战
-        elsif $game_temp.boss_battle
         # 如果是坛主
         elsif @enemy.id > 162 and @enemy.id < 171
         # 其他NPC
@@ -384,10 +362,14 @@ class Scene_Battle
       unless all_item.empty?
         all_item.each do |i|
           # 如果是三角石板，该掌门已获得则跳过
-          if i[0]==1 and i[1].abs==19 and @actor.stone_list.include?(@enemy.id)
-            next
-          else
-            @actor.stone_list.push(@enemy.id)
+          if i[0]==1 and i[1].abs==19
+            if @actor.stone_list.include?(@enemy.id)
+              next
+            else
+              @actor.stone_list.push(@enemy.id)
+              item_name += $data_items[19].name + " "
+              next
+            end
           end
           # 获得物品
           @actor.gain_item(i[0],i[1].abs) if @actor.can_get_item?(i[0],i[1].abs)

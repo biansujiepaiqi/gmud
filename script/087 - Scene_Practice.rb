@@ -73,6 +73,7 @@ class Scene_Practice
   def draw_error(text,time=40)
     @talk_window.auto_text(text.dup)
     @talk_window.visible = true
+    @actor.get_kf_efflv(kf_id)*10
     for i in 0..time
       # 刷新画面
       Graphics.update
@@ -181,7 +182,7 @@ class Scene_Practice
       return
     end
     # 判断内力上限是否足够
-    if @actor.maxfp >= @actor.get_kf_efflv(kf_id)
+    if @actor.maxfp < @actor.get_kf_efflv(kf_id)*10
       draw_error($data_text.pra_no_fp)
       return_menu
       return

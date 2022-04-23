@@ -108,6 +108,7 @@ class Game_Battler
   #--------------------------------------------------------------------------
   def attack_effect(target)
     hurt_num = 0
+    self.damage = nil
     # 清除会心一击标志
     self.critical = false
     # 命中参数
@@ -492,10 +493,41 @@ class Game_Battler
       @states_add[24] = [[4,[get_kf_efflv(41)/4,100].min]]
       return [0]
     when 25 # 恶虎啸
+      # 龙象般若功有效等级+5≥目标内力最大值/10
+      if get_kf_efflv(47)+5 >= target.maxfp/10
+        turns = get_kf_efflv(47)/30+1
+        self.damage = get_kf_efflv(47)+5-target.maxfp/10
+        target.add_state(0,turns)
+        target.hp -= self.damage
+        text = sp_skill.success_text[0].deep_clone
+      else
+        self.damage = "Miss"
+        text = sp_skill.fail_text[0].deep_clone
+      end
+      add_cd_time(25,5)
+      return [0,text]
     when 26 # 飞鹰召唤
+      turns = get_kf_efflv(44)/10
+      target.add_state(26,turns)
+      add_cd_time(26,11)
+      return [0]
     when 27 # 变鹰术
+      turns = get_kf_efflv(44)/20
+      @eva_plus += get_kf_efflv(44)*(5+rand(6))/10
+      add_state(27,turns)
+      add_cd_time(27,turns)
+      @states_add[27] = [[2,get_kf_efflv(44)*(5+rand(6))/10]]
+      return [0]
     when 28 # 变熊术
-    
+      turns = get_kf_efflv(47)/20+get_kf_level(48)/15
+      addition_str = get_kf_efflv(47)/10+get_kf_level(48)/8
+      addition_def = get_kf_efflv(47)/2+get_kf_level(48)
+      @str_plus += addition_str
+      @def_plus += addition_def
+      add_state(28,turns)
+      add_cd_time(28,turns)
+      @states_add[28] = [[5,addition_str],[4,addition_def]]
+      return [0]
     end
   end
 end

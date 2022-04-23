@@ -142,7 +142,7 @@ class Scene_Battle
         return
       end
       # 如果物品用完的情况下
-      if @actor.item_number(1,item[1]) == 0
+      if @actor.item_number(item[1]) == 0
         # 演奏冻结 SE
         $game_system.se_play($data_system.buzzer_se)
         return

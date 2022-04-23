@@ -12,8 +12,7 @@ class Scene_Event
     @npc_step = 1
     # 是否为拜访目标
     if $game_task.visit_id == @id
-      @talk_window.auto_text($data_text.i_know_text)
-      @talk_window.visible=true
+      show_text($data_text.i_know_text)
       # -1与村长回复去领赏
       $game_task.visit_id=-1
       @talk_step = 3

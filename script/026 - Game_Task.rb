@@ -254,6 +254,7 @@ class Game_Task
     bad_data.each do |i|
       @wanted_data.skill_list.push([i,level])
     end
+    p $data_enemies[198]
     # 生成恶人事件
     create_badman(index,gender)
   end
