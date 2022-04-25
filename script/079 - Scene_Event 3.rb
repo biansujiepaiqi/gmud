@@ -104,7 +104,7 @@ class Scene_Event
     else
       # 距离上次任务不足5分钟
       if time-$game_task.wanted_time<300
-        return $date_text.no_bad_text
+        return $data_text.no_bad_task
       else
         # 发布恶人任务
         return set_new_badman
@@ -152,6 +152,8 @@ class Scene_Event
         Graphics.update
       end
       talk = $game_task.finish_stone
+      # 播放奖励音效
+      $game_system.se_play($data_system.actor_collapse_se)
     end    
     return talk
   end

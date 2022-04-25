@@ -201,8 +201,8 @@ class Game_Task
     $game_temp.badman_place=@wanted_place
     @wanted_time = Graphics.frame_count/Graphics.frame_rate
     # 生成姓名
-    name1=rand(7)
-    name2=rand(7)
+    name1=rand(8)
+    name2=rand(8)
     gender= name2>3 ? 0 : 1
     @wanted_name=$data_text.bad_name1[name1]+$data_text.bad_name2[name2]
     # 更新恶人计数
@@ -254,7 +254,6 @@ class Game_Task
     bad_data.each do |i|
       @wanted_data.skill_list.push([i,level])
     end
-    p $data_enemies[198]
     # 生成恶人事件
     create_badman(index,gender)
   end
@@ -344,8 +343,10 @@ class Game_Task
     # 设定角色图
     if gender == 0
       character_name = "Bad_Man"
+      $data_enemies[198].battler_name = "NPC_Tile_11"
     else
       character_name = "Bad_Woman"
+      $data_enemies[198].battler_name = "NPC_Tile_03"
     end
     $game_temp.bad_man.pages[0].graphic.character_name=character_name
   end

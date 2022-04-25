@@ -181,6 +181,8 @@ class Scene_Title
     $game_player.straighten
     # 卸下所有装备
     $game_actor.unequip_all
+    $game_actor.check_item_bag
+    $game_actor.check_stone_list
     # 设置系统默认字体
     Font.default_name = (["WQX12","宋体","黑体","楷体"])
     # 设置铸造武器属性

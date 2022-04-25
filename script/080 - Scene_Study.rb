@@ -272,11 +272,11 @@ class Scene_Study
     @learn.contents.clear
     # 边框
     @learn.contents.fill_rect(5,9,200,1,color)
-    @learn.contents.fill_rect(5,19,200,1,color)
-    @learn.contents.fill_rect(5,9,1,10,color)
+    @learn.contents.fill_rect(5,24,200,1,color)
+    @learn.contents.fill_rect(5,9,1,15,color)
     @learn.contents.fill_rect(205,9,1,11,color)
     # 进度条
-    @learn.contents.fill_rect(5,9,process,10,color)
+    @learn.contents.fill_rect(5,9,process,15,color)
     # 点数/等级
     @learn.contents.draw_text(216,0,@learn.width-248,32,text)
   end

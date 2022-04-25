@@ -253,4 +253,27 @@ class Game_Actor < Game_Battler
       @ball = number
     end
   end
+  #--------------------------------------------------------------------------
+  # ● 检查背包
+  #--------------------------------------------------------------------------
+  def check_item_bag
+    return if @item_bag.empty?
+    @item_bag.each_index do |i|
+      if @item_bag[i][0] == 1 and @item_bag[i][1] == 19
+        @item_bag.delete_at(i)
+        break
+      end
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● 检查石板列表
+  #--------------------------------------------------------------------------
+  def check_stone_list
+    return if @stone_list.empty?
+    @stone_list.each do |i|
+      if not [48,59,81,95,102,111].include?(i)
+        @stone_list.delete(i)
+      end
+    end
+  end
 end
