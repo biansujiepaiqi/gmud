@@ -207,8 +207,10 @@ class Game_Task
     @wanted_name=$data_text.bad_name1[name1]+$data_text.bad_name2[name2]
     # 更新恶人计数
     @wanted_count += 1
-    @wanted_turn += 1 if @wanted_count>10
-    @wanted_count %=10
+    if @wanted_count > 10
+      @wanted_turn += 1
+      @wanted_count = 1
+    end
     # 生成奖励数据
     @wanted_reward = (80 + rand(80))*(@wanted_count+@wanted_turn-1)
     # 生成恶人数据
@@ -236,9 +238,14 @@ class Game_Task
     @wanted_data.base_luc = @actor.base_luc
     @wanted_data.maxhp = @actor.maxhp*percent/100
     @wanted_data.maxfp = @actor.maxfp*percent/100
-    @wanted_data.maxmp = @actor.maxfp*percent/100 if class_id==8
+    if class_id == 8
+      @wanted_data.maxmp = @actor.maxfp*percent/100
+      @wanted_data.mp_plus = @wanted_data.maxmp/40
+    else
+      @wanted_data.maxmp = 0
+      @wanted_data.mp_plus = 0
+    end
     @wanted_data.fp_plus = @wanted_data.maxfp/40
-    @wanted_data.mp_plus = @wanted_data.maxmp/40 if class_id==8
     @wanted_data.hp = @wanted_data.maxhp
     @wanted_data.fp = @wanted_data.maxfp
     @wanted_data.mp = @wanted_data.maxmp
@@ -251,7 +258,7 @@ class Game_Task
     level = @actor.get_max_level*percent/100
     # 生成恶人技能列表，等级取玩家技能最高等级*轮次系数
     @wanted_data.skill_list = []
-    bad_data.each do |i|
+    bad_data[8].each do |i|
       @wanted_data.skill_list.push([i,level])
     end
     # 生成恶人事件

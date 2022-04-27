@@ -48,7 +48,7 @@ class Game_Battler
     if kf_type == 9
       action_list = $data_kungfus[kf_id].def_word.deep_clone
       # 如果act_id越界，则随机获取招式
-      if [0...action_list.size].include?(act_id)
+      if (0...action_list.size).include?(act_id)
         return action_list[act_id]
       else
         # 获取随机招式
@@ -63,7 +63,7 @@ class Game_Battler
         action_list.push(i) if i[0] <= lv
       end
       # 如果act_id越界，则随机获取招式
-      if [0...action_list.size].include?(act_id)
+      if (0...action_list.size).include?(act_id)
         action = action_list[act_id]
       else
         # 获取随机招式
@@ -274,11 +274,17 @@ class Game_Battler
   #     state_id : 状态 ID
   #     state_turn : 持续回合
   #--------------------------------------------------------------------------
-  def add_state(state_id,turns)
+  def add_state(state_id,turns,plus = 0)
     # 已有状态的情况下
     if state?(state_id)
-      # 更新持续时间
-      @states_turn[state_id] = turns
+      # 非增加回合的情况
+      if plus == 0
+        # 更新持续时间
+        @states_turn[state_id] = [turns,@states_turn[state_id]].max
+      else
+        # 增加持续时间
+        @states_turn[state_id] += turns
+      end
       return
     else
       # 新增状态及持续时间
@@ -361,11 +367,14 @@ class Game_Battler
   def remove_states_auto
     removed = []
     for i in @states_turn.keys.clone
+      # 铸造武器状态则跳过
+      next if [-4,-5].include?(i)
+      # 持续回合减一
       if @states_turn[i] > 0
         @states_turn[i] -= 1
         if @states_turn[i] == 0
           remove_state(i)
-          removed.push(i)
+          removed.push(i) if i > 0
         end
       end
     end

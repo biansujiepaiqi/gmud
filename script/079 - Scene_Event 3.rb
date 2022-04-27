@@ -31,6 +31,8 @@ class Scene_Event
       talk = work_talk
     when 31 # 顾炎武
       talk = reward_talk
+    when 148 # 干匠
+      talk = sword_talk
     end
     talk = common_talk if talk == nil
     return if talk == nil
